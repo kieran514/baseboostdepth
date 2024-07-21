@@ -53,6 +53,11 @@ SYNS: (Edge-Acc, Edge-Comp, Point cloud F-Score, Point cloud IoU)
 
 ## Training
 
+### Prepare Validation Data
+```
+python export_gt_depth.py --data_path data/KITTI_RAW --split eigen_zhou
+```
+
 ```
 bash run.sh
 ```
