@@ -68,7 +68,6 @@ bash run.sh
 We must prepare ground truth files for testing/validation and training.
 ```
 python export_gt_depth.py --data_path data/KITTI_RAW --split eigen
-python export_gt_depth.py --data_path data/KITTI_RAW --split eigen_zhou
 python export_gt_depth.py --data_path data/KITTI_RAW --split eigen_benchmark
 ```
 
