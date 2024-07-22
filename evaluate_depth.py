@@ -1,7 +1,5 @@
-# python evaluate_depth_MD2.py --eval_mono --load_weights_folder /media/kieran/Extreme_SSD/Zeus/paper/Decomp/0.4/weights_19/ --kt_path /media/kieran/Extreme_SSD/data/KITTI_RAW --eval_split eigen
-# python evaluate_depth_MD2.py --eval_mono --load_weights_folder /media/kieran/Extreme_SSD/Zeus/paper/Decomp/0.4/weights_19/ --kt_path /media/kieran/Extreme_SSD/data/KITTI_RAW --eval_split SYNS
+# Many thanks go to https://github.com/jspenmar/slowtv_monodepth for the general code for edge and point cloud evaluation.
 
-from __future__ import absolute_import, division, print_function
 from torchvision.utils import save_image
 
 import os
@@ -11,7 +9,6 @@ import tqdm
 import torch
 from torch.utils.data import DataLoader
 from scipy import ndimage
-
 from layers import disp_to_depth
 from utils import readlines
 from options import MonodepthOptions
@@ -23,24 +20,24 @@ cv2.setNumThreads(0)
 cham = ChamferDistance()
 import time
 
-# python evaluate_depth_MD2.py --eval_mono --load_weights_folder /media/kieran/Extreme_SSD/Zeus/paper/Decomp_0.4/ --kt_path /media/kieran/Extreme_SSD/data/KITTI_RAW --eval_split SYNS --chamfer
+# python evaluate_depth.py --eval_mono --load_weights_folder /media/kieran/Extreme_SSD/Zeus/paper/Decomp_0.4/ --kt_path /media/kieran/Extreme_SSD/data/KITTI_RAW --eval_split eigen
+# python evaluate_depth.py --eval_mono --load_weights_folder /media/kieran/Extreme_SSD/Zeus/paper/Decomp_0.4/ --syns_path /media/kieran/Extreme_SSD/data/SYNS/SYNS --eval_split SYNS --chamfer
 
 class BackprojectDepth(nn.Module):
     def __init__(self, shape):
         super().__init__()
         self.h, self.w = shape
         self.ones = nn.Parameter(torch.ones(1, 1, self.h*self.w), requires_grad=False)
-
-        grid = torch.meshgrid(torch.arange(self.w), torch.arange(self.h))  # (h, w), (h, w)
-        pix = torch.stack(grid).view(2, -1)[None]  # (1, 2, h*w) as (x, y)
-        pix = torch.cat((pix, self.ones), dim=1)  # (1, 3, h*w)
+        grid = torch.meshgrid(torch.arange(self.w), torch.arange(self.h))  
+        pix = torch.stack(grid).view(2, -1)[None]  
+        pix = torch.cat((pix, self.ones), dim=1)
         self.pix = nn.Parameter(pix, requires_grad=False)
 
     def forward(self, depth, K_inv):
         b = depth.shape[0]
-        pts = K_inv[:, :3, :3] @ self.pix.repeat(b, 1, 1) # (b, 3, h*w) Cam rays.
+        pts = K_inv[:, :3, :3] @ self.pix.repeat(b, 1, 1) 
         pts *= depth.flatten(-2)  # 3D points.
-        pts = torch.cat((pts[0], self.ones.repeat(b, 1, 1)), dim=1)  # (b, 4, h*w) Add homogenous.
+        pts = torch.cat((pts[0], self.ones.repeat(b, 1, 1)), dim=1)  
         return pts
 
 splits_dir = os.path.join("splits")
@@ -50,11 +47,9 @@ def to_log(depth):
     depth = (depth > 0) * np.log(depth.clip(min=1.1920928955078125e-07))
     return depth
 def _metrics_pointcloud(pred, target, th):
-    """Helper to compute F-Score and IoU with different correctness thresholds."""
-    P = (pred < th).float().mean()  # Precision - How many predicted points are close enough to GT?
-    R = (target < th).float().mean()  # Recall - How many GT points have a predicted point close enough?
-    if (P < 1e-3) and (R < 1e-3): return P, P  # No points are correct.
-
+    P = (pred < th).float().mean() 
+    R = (target < th).float().mean()  
+    if (P < 1e-3) and (R < 1e-3): return P, P 
     f = 2*P*R / (P + R)
     iou = P*R / (P + R - (P*R))
     return f, iou
@@ -66,25 +61,19 @@ def compute_errors(gt, pred, opt, gt_edge_org=None, pred_edge_org=None, inv_K=No
     a1 = (thresh < 1.25     ).mean()
     a2 = (thresh < 1.25 ** 2).mean()
     a3 = (thresh < 1.25 ** 3).mean()
-
     rmse = (gt - pred) ** 2
     rmse = np.sqrt(rmse.mean())
-
     rmse_log = (np.log(gt) - np.log(pred)) ** 2
     rmse_log = np.sqrt(rmse_log.mean())
-
     abs_rel = np.mean(np.abs(gt - pred) / gt)
-
     sq_rel = np.mean(((gt - pred) ** 2) / gt)
 
     if opt.eval_split == 'SYNS':
         err = np.abs(pred - gt)
         err = err.mean()
-
         pred_point = torch.as_tensor(pred_org, device='cuda:0')
         target_point = torch.as_tensor(gt_org, device='cuda:0')
         K_inv = torch.as_tensor(inv_K, device='cuda:0')[None]
-
         backproj = BackprojectDepth(pred_point.shape).to('cuda:0')
         pred_pts = backproj(pred_point[None, None], K_inv)[:, :3, mask.flatten()]
         target_pts = backproj(target_point[None, None], K_inv)[:, :3, mask.flatten()]
@@ -98,16 +87,11 @@ def compute_errors(gt, pred, opt, gt_edge_org=None, pred_edge_org=None, inv_K=No
         ###################### CHAMFER DIST #################################
 
         mask = np.logical_and(mask, gt_edge_org[:,:,0])
-
         th_edges = 10
         D_target = ndimage.distance_transform_edt(1 - mask) 
-
         D_pred = ndimage.distance_transform_edt(1 - pred_edge_org[:,:,0]) 
-
         pred_edges = pred_edge_org[:,:,0] & (D_target < th_edges)  
-
         edge_Acc = D_target[pred_edges].mean() if pred_edges.sum() else th_edges
-
         edge_comp = D_pred[mask].mean() if pred_edges.sum() else th_edges
 
         if opt.chamfer:
@@ -116,7 +100,6 @@ def compute_errors(gt, pred, opt, gt_edge_org=None, pred_edge_org=None, inv_K=No
             return abs_rel, err, sq_rel, rmse, rmse_log, edge_Acc, edge_comp
     else:
         return abs_rel, sq_rel, rmse, rmse_log, a1, a2, a3
-
 
 def evaluate(opt):
     """Evaluates a pretrained model using a specified test set
@@ -127,7 +110,6 @@ def evaluate(opt):
     else:
         MIN_DEPTH = 1e-3
         MAX_DEPTH = 80
-
 
     assert sum((opt.eval_mono, opt.eval_stereo)) == 1, \
         "Please choose mono or stereo evaluation by setting either --eval_mono or --eval_stereo"
@@ -143,31 +125,25 @@ def evaluate(opt):
     decoder_path = os.path.join(opt.load_weights_folder, "depth.pth")
     encoder_dict = torch.load(encoder_path, map_location='cuda:0')
 
-
     if opt.eval_split == 'SYNS':
         print("Using SYNS\n")
         dataset = datasets.SYNSRAWDataset(filenames, 0,
                                             encoder_dict['height'], encoder_dict['width'],
-                                            [0], 4, is_train=False,
-                                            valid_datatypes=['MS'], naive_mix = True)
+                                            is_train=False, naive_mix = True, syns_path=opt.syns_path)
     else:
         print("Using KITTI\n")
-        dataset = datasets.MixedDataset(filenames, 0,
+        dataset = datasets.KITTIRAWDataset(filenames, 0,
                                             encoder_dict['height'], encoder_dict['width'],
-                                            [0], 4, kt_path=opt.kt_path , is_train=False,
-                                            valid_datatypes=['MS'], kt=True, naive_mix = True)
-
-    dataloader = DataLoader(dataset, 1, shuffle=False, num_workers=4,
+                                            kt_path=opt.kt_path , is_train=False, kt=True, naive_mix = True)
+    dataloader = DataLoader(dataset, 1, shuffle=False, num_workers=0,
                         pin_memory=True, drop_last=False)
     
     if opt.ViT:
         import networksvit
-
         encoder_dict = torch.load(encoder_path, map_location='cuda:0')
-        encoder = networksvit.mpvit_small() #networks.ResnetEncoder(opt.num_layers, False)
-        encoder.num_ch_enc = [64,128,216,288,288]  # = networks.ResnetEncoder(opt.num_layers, False)
+        encoder = networksvit.mpvit_small()
+        encoder.num_ch_enc = [64,128,216,288,288] 
         depth_decoder = networksvit.DepthDecoder()
-
         model_dict = encoder.state_dict()
         encoder.load_state_dict({k: v for k, v in encoder_dict.items() if k in model_dict})
         depth_decoder.load_state_dict(torch.load(decoder_path, map_location='cuda:0'), strict=False)
@@ -176,7 +152,6 @@ def evaluate(opt):
         encoder_dict = torch.load(encoder_path, map_location='cuda:0')
         encoder = networksCA.ResnetEncoder(50, False)
         depth_decoder = networksCA.DepthDecoder(encoder.num_ch_enc)
-
         model_dict = encoder.state_dict()
         encoder.load_state_dict({k: v for k, v in encoder_dict.items() if k in model_dict})
         depth_decoder.load_state_dict(torch.load(decoder_path, map_location='cuda:0'), strict=False)      
@@ -186,7 +161,6 @@ def evaluate(opt):
         encoder = networksSQL.ResnetEncoderDecoder(num_layers=50, num_features=256, model_dim=32)
         depth_decoder = networksSQL.Lite_Depth_Decoder_QueryTr(in_channels=32, patch_size=16, dim_out=64, embedding_dim=32, 
                                                         query_nums=64, num_heads=4, min_val=0.001, max_val=80.0)
-
         model_dict = encoder.state_dict()
         encoder.load_state_dict({k: v for k, v in encoder_dict.items() if k in model_dict})
         depth_decoder.load_state_dict(torch.load(decoder_path, map_location='cuda:0'))    
@@ -196,14 +170,12 @@ def evaluate(opt):
         encoder = networksSQL.ResnetEncoderDecoder(num_layers=50, num_features=256, model_dim=32)
         depth_decoder = networksSQL.Lite_Depth_Decoder_QueryTr(in_channels=32, patch_size=20, dim_out=128, embedding_dim=32, 
                                                         query_nums=128, num_heads=4, min_val=0.001, max_val=80.0)
-
         model_dict = encoder.state_dict()
         encoder.load_state_dict({k: v for k, v in encoder_dict.items() if k in model_dict})
         depth_decoder.load_state_dict(torch.load(decoder_path, map_location='cuda:0'))      
     elif opt.DIFFNet:
         import networksDIFF
         decoder_dict = torch.load(decoder_path, map_location = 'cuda:0')
-
         encoder = networksDIFF.test_hr_encoder.hrnet18(False)
         encoder.num_ch_enc = [ 64, 18, 36, 72, 144 ]
         depth_decoder = networksDIFF.HRDepthDecoder(encoder.num_ch_enc, opt.scales)
@@ -215,10 +187,8 @@ def evaluate(opt):
     else:
         import networks
         encoder_dict = torch.load(encoder_path, map_location='cuda:0')
-
         encoder = networks.ResnetEncoder(opt.num_layers, False)
         depth_decoder = networks.DepthDecoder(encoder.num_ch_enc)
-
         model_dict = encoder.state_dict()
         encoder.load_state_dict({k: v for k, v in encoder_dict.items() if k in model_dict})
         depth_decoder.load_state_dict(torch.load(decoder_path, map_location='cuda:0'), strict=False)
@@ -227,7 +197,6 @@ def evaluate(opt):
     encoder.eval()
     depth_decoder.to("cuda:0")
     depth_decoder.eval()
-
     pred_disps = []
 
     print("-> Computing predictions with size {}x{}".format(
@@ -236,23 +205,17 @@ def evaluate(opt):
     with torch.no_grad():
         for data in tqdm.tqdm(dataloader):
             input_color = data[("color", 0, 0)].to("cuda:0")
-
             output = depth_decoder(encoder(input_color))
-
             if opt.eval_split == 'SYNS':
                 inv_K = data[("inv_K", -1)]
-
 
             if opt.SQL or opt.SQL_L:
                 pred_disp = output[("disp", 0)]
             else:
                 pred_disp, _ = disp_to_depth(output[("disp", 0)], opt.min_depth, opt.max_depth)
-
             pred_disp = pred_disp.cpu()[:, 0]
-            # pred_disp = pred_disp.cpu()[:, 0].numpy()
 
             pred_disps.append(pred_disp)
-
     pred_disps = np.concatenate(pred_disps)
 
     if opt.eval_split == 'SYNS':
@@ -301,7 +264,6 @@ def evaluate(opt):
             edges = np.sqrt(dx**2 + dy**2)[..., None]
             pred_edge = edges > edges.mean()
 
-        # mask = np.logical_and(gt_depth > MIN_DEPTH, gt_depth < 10000)
         mask = np.logical_and(gt_depth > MIN_DEPTH, gt_depth < MAX_DEPTH)
 
         if opt.eval_split != 'SYNS':

@@ -1,10 +1,3 @@
-# TODO
-# Check if file exists rather than try except
-# remomve void vairables
-# Nothing stopping us from limiting the data input from the baseline valie 
-# (for the boosting stage we take in 7 images, but if that given image has 
-# a basline that hits the upper bound then we can lmit the input)
-# Rewrite everything
 
 from __future__ import absolute_import, division, print_function
 from PIL import ImageFile
@@ -163,6 +156,24 @@ class MonoDataset(data.Dataset):
                 inputs[("K", -1)] = torch.from_numpy(K)
                 inputs[("inv_K", -1)] = torch.from_numpy(inv_K)
                 return inputs
+            
+            elif type(self).__name__ == "KITTIOdomDataset":
+                folder, frame_index, side = self.index_to_folder_and_frame_idx(index)
+                for k in range(8):
+                    try:
+                        inputs[("color", k, -1)] = self.get_color(self.kt_path, folder, frame_index, side, False, i=k)
+                    except:
+                        pass
+
+                color_aug = (lambda x: x)
+                self.preprocess(inputs, color_aug)
+                for k in range(8):
+                    try:
+                        del inputs[("color", k, -1)]
+                    except:
+                        pass
+                                
+                return inputs
 
     def __len__(self):
         if self.naive_mix:
@@ -179,8 +190,6 @@ class MonoDataset(data.Dataset):
                 n, im, i = k
                 for scale in self.scales:
                     inputs[(n, im, scale)] = self.resize[scale](inputs[(n, im, scale - 1)])
-
-                # inputs[(n, im, 0)] = self.resize[0](inputs[(n, im, -1)])
 
         avoid_scale = [1,2,3] 
 

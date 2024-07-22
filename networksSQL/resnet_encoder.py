@@ -1,11 +1,5 @@
-# Copyright Niantic 2019. Patent Pending. All rights reserved.
-#
-# This software is licensed under the terms of the Monodepth2 licence
-# which allows for non-commercial use only, the full terms of which are made
-# available in the LICENSE file.
 
 from __future__ import absolute_import, division, print_function
-# from pyexpat import features
 
 import numpy as np
 
@@ -68,7 +62,6 @@ class ResnetEncoder(nn.Module):
         super(ResnetEncoder, self).__init__()
 
         self.num_ch_enc = np.array([64, 64, 128, 256, 512])
-
         resnets = {18: models.resnet18,
                    34: models.resnet34,
                    50: models.resnet50,

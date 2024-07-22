@@ -1,8 +1,3 @@
-# Copyright Niantic 2019. Patent Pending. All rights reserved.
-#
-# This software is licensed under the terms of the Monodepth2 licence
-# which allows for non-commercial use only, the full terms of which are made
-# available in the LICENSE file.
 
 from __future__ import absolute_import, division, print_function
 
@@ -48,11 +43,6 @@ class PredictiveMask(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, input_features):
-        # input_features[0]:[12, 64, 96, 320]
-        # input_features[1]:[12, 64, 48, 160]
-        # input_features[2]:[12, 128, 24, 80]
-        # input_features[3]:[12, 256, 12, 40]
-        # input_features[4]:[12, 512, 6, 20]
         self.outputs = {}
 
         # decoder

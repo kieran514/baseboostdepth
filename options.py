@@ -15,50 +15,35 @@ class MonodepthOptions:
         self.parser.add_argument("--data_path",
                                  type=str,
                                  help="path to the training data",
-                                 default=os.path.join(file_dir, "kitti_data"))
+                                 default="data/KITTI_RAW")
         self.parser.add_argument("--syns_path",
                                  type=str,
                                  help="path to the training data",
-                                 default=os.path.join(file_dir, "kitti_data"))
+                                 default="data/KITTI_RAW")
         self.parser.add_argument("--kt_path",
                                  type=str,
                                  help="path to the training data",
                                  default=os.path.join(file_dir, "kitti_data"))
         self.parser.add_argument("--SYNS_eval",
-                                 help="if set, use front reconstrctuions",
+                                 help="Eval SYNS",
                                  action="store_true")
         self.parser.add_argument("--SQL",
-                                 help="if set, use front reconstrctuions",
-                                 action="store_true")
-        self.parser.add_argument("--no_adam",
-                                 help="if set, use front reconstrctuions",
+                                 help="Use SQL",
                                  action="store_true")
         self.parser.add_argument("--SQL_L",
-                                 help="if set, use front reconstrctuions",
+                                 help="Use SQL Large",
                                  action="store_true")
         self.parser.add_argument("--CA_depth",
-                                 help="if set, use front reconstrctuions",
+                                 help="Use CaDepth",
                                  action="store_true")
         self.parser.add_argument("--DIFFNet",
-                                 help="if set, use front reconstrctuions",
+                                 help="Use Diffnet",
                                  action="store_true")
         self.parser.add_argument("--rand",
                                  help="if set, use front reconstrctuions",
                                  action="store_true")
-        self.parser.add_argument("--reg_new",
-                                 help="if set, use new regularizer",
-                                 action="store_true")
-        self.parser.add_argument("--correct_pose",
-                                 help="if set, use new regularizer",
-                                 action="store_true")
         self.parser.add_argument("--chamfer",
-                                 help="if set, use new regularizer",
-                                 action="store_true")
-        self.parser.add_argument("--use_bright",
-                                 help="if set, use front reconstrctuions",
-                                 action="store_true")
-        self.parser.add_argument("--adaptive_pose_error",
-                                 help="if set, use front reconstrctuions",
+                                 help="Find pointcloud based results",
                                  action="store_true")
         self.parser.add_argument("--debug",
                                  help="if set, use front reconstrctuions",
@@ -67,15 +52,6 @@ class MonodepthOptions:
                                  help="if set, use front reconstrctuions",
                                  action="store_true")
         self.parser.add_argument("--trimin",
-                                 help="if set, use front reconstrctuions",
-                                 action="store_true")
-        self.parser.add_argument("--guidance",
-                                 help="if set, use front reconstrctuions",
-                                 action="store_true")
-        self.parser.add_argument("--pose_consistency",
-                                 help="if set, use front reconstrctuions",
-                                 action="store_true")
-        self.parser.add_argument("--distributed",
                                  help="if set, use front reconstrctuions",
                                  action="store_true")
         
@@ -89,48 +65,16 @@ class MonodepthOptions:
         self.parser.add_argument("--decomp",
                                  help="if set, use front reconstrctuions",
                                  action="store_true")
-        self.parser.add_argument("--stereo_scaler",
-                                 help="if set, use front reconstrctuions",
-                                 action="store_true")
-        self.parser.add_argument("--batch_size_increase",
-                                 help="if set, use front reconstrctuions",
-                                 action="store_true")
-        self.parser.add_argument("--decomp_weight",
-                                 default=0.1,
-                                 type=float)
-        self.parser.add_argument("--inversion",
-                    help="if set, use front reconstrctuions",
-                    action="store_true")
         self.parser.add_argument("--partial_skip",
                     help="if set, use front reconstrctuions",
                     action="store_true")
 
-        self.parser.add_argument("--high_depth",
-                              help="if set, use front reconstrctuions",
-                              action="store_true")
         self.parser.add_argument("--pose_error",
                                  default=1,
                                  type=float)
-        self.parser.add_argument("--sobel_weight",
-                                 default=1,
-                                 type=float)
-        self.parser.add_argument("--back_pose_error",
-                              help="if set, use front reconstrctuions",
-                              action="store_true")
-        self.parser.add_argument("--use_ident",
-                              help="if set, use front reconstrctuions",
-                              action="store_true")
-
-        self.parser.add_argument("--view",
-                                 type=int,
-                                 help="number of cuda",
-                                 default=0,
-                                 choices=[36,50,90,150])
-
         self.parser.add_argument("--training_file",
                                  type=str,
                                  help="train_file")
-
         self.parser.add_argument("--log_dir",
                                  type=str,
                                  help="log directory",
@@ -143,75 +87,9 @@ class MonodepthOptions:
         self.parser.add_argument("--ViT",
                                  help="if set, use monovitt depth netwrok",
                                  action="store_true")
-        self.parser.add_argument("--weighted",
-                                 help="if set, use weighted",
-                                 action="store_true")
-        self.parser.add_argument("--cl",
-                                 help="if set, use weighted",
-                                 action="store_true")
-        self.parser.add_argument("--depth_hint",
-                                 help="if set, use hint depth",
-                                 action="store_true")
-        self.parser.add_argument("--intrin",
-                                 help="learn intrinsics",
-                                 action="store_true")
-        self.parser.add_argument("--intrin_sup",
-                                 help="learn intrinsics",
-                                 action="store_true")
-        self.parser.add_argument("--save_imgs",
-                                 help="if set, save images in test",
-                                 action="store_true")
-        self.parser.add_argument("--pose_loss_addition",
-                                 help="the pose is supervised by the addiion",
-                                 action="store_true")
-        self.parser.add_argument("--pose_addition",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
-        self.parser.add_argument("--trimean",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
-        self.parser.add_argument("--winsorized_mean",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
-        self.parser.add_argument("--occ_mean",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
-        self.parser.add_argument("--further_loss",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
-        self.parser.add_argument("--res",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
-        self.parser.add_argument("--rand_frame",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
-        self.parser.add_argument("--mean",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
-        self.parser.add_argument("--median",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
         
-        self.parser.add_argument("--skipper_new",
-                                 type=int,
-                                 help="how many frames we skip into the future",
-                                 default=1)
-        self.parser.add_argument("--extra_occ",
-                                 help="we use pose addition as out main",
-                                 action="store_true")
-
-        # TRAINING options
-        self.parser.add_argument("--skipping",
-                                 help="skip files",
-                                 action="store_true")
-        self.parser.add_argument("--sandmoptim",
-                                 help="skip files",
-                                 action="store_true")
         self.parser.add_argument("--incremental_skip",
                                  help="skip files",
-                                 action="store_true")
-        self.parser.add_argument("--zigzag",
-                                 help="zigzag files",
                                  action="store_true")
 
         self.parser.add_argument("--model_name",
@@ -267,22 +145,11 @@ class MonodepthOptions:
         self.parser.add_argument("--use_stereo",
                                  help="if set, uses stereo pair for training",
                                  action="store_true")
-        self.parser.add_argument("--hold",
-                                 help="if set, uses stereo pair for training",
-                                 action="store_true")
-        self.parser.add_argument("--mix",
-                                 help="if set, uses stereo pair for training",
-                                 action="store_true")
         self.parser.add_argument("--frame_ids",
                                  nargs="+",
                                  type=int,
                                  help="frames to load",
                                  default=[0, -1, 1])
-        self.parser.add_argument("--no_guide",
-                                 nargs="+",
-                                 type=int,
-                                 help="no guidance from stereo",
-                                 default=[0, 1])
 
         # OPTIMIZATION options
         self.parser.add_argument("--batch_size",
@@ -297,30 +164,12 @@ class MonodepthOptions:
                                  type=int,
                                  help="number of epochs",
                                  default=20)
-        self.parser.add_argument("--scheduler_step_size",
-                                 type=int,
-                                 help="step size of the scheduler",
-                                 default=15)
 
-        # ABLATION options
-        self.parser.add_argument("--v1_multiscale",
-                                 help="if set, uses monodepth v1 multiscale",
-                                 action="store_true")
-        
         self.parser.add_argument("--naive_mix",
                                  help="mixing stratergy",
                                  action="store_true")
         
 
-        self.parser.add_argument("--avg_reprojection",
-                                 help="if set, uses average reprojection loss",
-                                 action="store_true")
-        self.parser.add_argument("--disable_automasking",
-                                 help="if set, doesn't do auto-masking",
-                                 action="store_true")
-        self.parser.add_argument("--predictive_mask",
-                                 help="if set, uses a predictive masking scheme as in Zhou et al",
-                                 action="store_true")
         self.parser.add_argument("--no_ssim",
                                  help="if set, disables ssim in the loss",
                                  action="store_true")
@@ -329,16 +178,6 @@ class MonodepthOptions:
                                  help="pretrained or scratch",
                                  default="pretrained",
                                  choices=["pretrained", "scratch"])
-        self.parser.add_argument("--pose_model_input",
-                                 type=str,
-                                 help="how many images the pose network gets",
-                                 default="pairs",
-                                 choices=["pairs", "all"])
-        self.parser.add_argument("--pose_model_type",
-                                 type=str,
-                                 help="normal or shared",
-                                 default="separate_resnet",
-                                 choices=["posecnn", "separate_resnet", "shared"])
 
         # SYSTEM options
         self.parser.add_argument("--no_cuda",
@@ -410,51 +249,7 @@ class MonodepthOptions:
                                       "from the original monodepth paper",
                                  action="store_true")
         
-        ########################
         self.parser.add_argument("--kt",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--cs",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--ox",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--ad",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--fd",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--aps",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--ds",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--ddad",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--mal",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--hol",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--ms",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--fov",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--gb",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-
-        self.parser.add_argument("--sim",
-                                 help="loads the specified dataset",
-                                 action="store_true")
-        self.parser.add_argument("--au",
                                  help="loads the specified dataset",
                                  action="store_true")
     def parse(self):

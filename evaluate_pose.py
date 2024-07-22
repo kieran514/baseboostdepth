@@ -1,9 +1,3 @@
-# Copyright Niantic 2019. Patent Pending. All rights reserved.
-#
-# This software is licensed under the terms of the Monodepth2 licence
-# which allows for non-commercial use only, the full terms of which are made
-# available in the LICENSE file.
-
 from __future__ import absolute_import, division, print_function
 
 import os
@@ -62,11 +56,10 @@ def evaluate(opt):
         os.path.join(os.path.dirname(__file__), "splits", "odom",
                      "test_files_{:02d}.txt".format(sequence_id)))
 
-    dataset = KITTIOdomDataset(filenames, 0, 192, 640,
-                                            [0], 4, kt_path=opt.kt_path , is_train=False,
-                                            valid_datatypes=['MS'], kt=True, naive_mix = True)
+    dataset = KITTIOdomDataset(filenames, 0, 192, 640, kt_path=opt.kt_path , is_train=False,
+                                            kt=True, naive_mix = True)
     
-    dataloader = DataLoader(dataset, 1, shuffle=False, num_workers=6,
+    dataloader = DataLoader(dataset, 1, shuffle=False, num_workers=8,
                         pin_memory=True, drop_last=False)
 
     pose_encoder_path = os.path.join(opt.load_weights_folder, "pose_encoder.pth")
@@ -87,7 +80,7 @@ def evaluate(opt):
     pred_poses_multi = []
     print("-> Computing pose predictions")
 
-    skip_frame = 7
+    skip_frame = 2
 
     opt.frame_ids = [0, skip_frame]  # pose network only takes two frames as input
 
@@ -107,9 +100,6 @@ def evaluate(opt):
 
                 pred_poses_multi_step = []
 
-                # new_axis = torch.zeros(axisangle.shape).cuda()
-                # new_tran = torch.zeros(translation.shape).cuda()
-
                 for number in range(skip_frame):
                     all_color_aug = torch.cat([inputs[("color", number, 0)], inputs[("color", number +1, 0)]], 1)
 
@@ -117,17 +107,10 @@ def evaluate(opt):
                     axisangle, translation = pose_decoder(features)
                     pred_poses_multi_step.append(
                         transformation_from_parameters(axisangle[:, 0], translation[:, 0]))
-
-                    # new_axis += axisangle
-                    # new_tran += translation
-
-                # pred_poses_multi.append(
-                #     transformation_from_parameters(new_axis[:, 0], new_tran[:, 0]).cpu().numpy())
-                
                                     
                 T_rel_cumulative = torch.eye(4)
 
-                for pose_step in pred_poses_multi_step:
+                for pose_step in pred_poses_multi_step[::-1]:
                     T_rel_cumulative = torch.matmul(T_rel_cumulative.cuda(), pose_step.cuda())
 
                 pred_poses_multi.append(T_rel_cumulative.cpu().numpy())
@@ -145,18 +128,19 @@ def evaluate(opt):
     gt_global_poses[:, 3, 3] = 1
 
     gt_local_poses = []
-    gt_local_poses_by2 = []
     for i in range(skip_frame, len(gt_global_poses)):
         if skip_frame > 1:
 
-            gt_local_poses_by2 = [np.dot(np.linalg.inv(gt_global_poses[i-skip_frame + k]), gt_global_poses[i - skip_frame + k +1]) for k in range(skip_frame)]
+            # list_poses = [np.linalg.inv(np.dot(np.linalg.inv(gt_global_poses[i - 1 - k]), gt_global_poses[i-k])) for k in range(skip_frame)]
+            # T_rel_cumulative = np.eye(4)
 
-            T_rel_cumulative = np.eye(4)
-            for T in gt_local_poses_by2:
-                T_rel_cumulative = np.dot(T_rel_cumulative, T)
+            # for pose_step in list_poses:
+            #     T_rel_cumulative = np.dot(T_rel_cumulative, pose_step)
+            # gt_local_poses.append(T_rel_cumulative)
 
             gt_local_poses.append(
-                np.linalg.inv(T_rel_cumulative))
+                np.linalg.inv(np.dot(np.linalg.inv(gt_global_poses[i - skip_frame]), gt_global_poses[i])))
+
         else:
             gt_local_poses.append(
                 np.linalg.inv(np.dot(np.linalg.inv(gt_global_poses[i - 1]), gt_global_poses[i])))

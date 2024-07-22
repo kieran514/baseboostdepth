@@ -124,7 +124,7 @@ class Trainer:
             self.img_ext = '.png' if self.opt.png else '.jpg'
         val_filenames = {}
         if self.opt.naive_mix:
-            val_filenames = readlines(os.path.join(os.path.dirname(__file__), "splits", 'eigen', "test_files.txt"))
+            val_filenames = readlines(os.path.join(os.path.dirname(__file__), "splits", 'eigen_zhou', "val_files.txt"))
         val_dataset = self.dataset(val_filenames, 0, self.opt.height, self.opt.width, 
                                    kt_path=self.opt.kt_path, is_train=False, img_ext='.jpg', kt=self.opt.kt, naive_mix = self.opt.naive_mix)
         self.val_loader = DataLoader(val_dataset, 1, shuffle=False, num_workers=1, pin_memory=True, drop_last=False)
@@ -147,7 +147,7 @@ class Trainer:
             self.num_total_steps = self.len_train_dataset // self.opt.batch_size * self.opt.num_epochs
             print("There are {:d} training items and {:d} validation items\n".format(
                 self.len_train_dataset, len(val_filenames)))
-        gt_path = os.path.join('splits', self.opt.eval_split, "gt_depths.npz")
+        gt_path = os.path.join('splits', 'eigen_zhou', "gt_depths.npz")
         self.gt_depths = np.load(gt_path, fix_imports=True, encoding='latin1', allow_pickle=True)["data"]
         if self.opt.SYNS_eval:
             gt_path_syns_edges = os.path.join('splits', "SYNS", "gt_edges.npz")
@@ -226,7 +226,7 @@ class Trainer:
                     w = self.opt.width // (2 ** scale)
                     self.backproject_depth[scale] = BackprojectDepth(self.opt.batch_size, h, w)
                     self.backproject_depth[scale].to(self.device)
-                    self.project_3d[scale] = Project3D(self.opt.batch_size, h, w, extra_occ=self.opt.extra_occ)
+                    self.project_3d[scale] = Project3D(self.opt.batch_size, h, w)
                     self.project_3d[scale].to(self.device)
 
             for batch_idx, inputs in enumerate(tqdm(self.train_loader, mininterval=2)):
@@ -263,7 +263,7 @@ class Trainer:
                 self.model_optimizer.step()
                 duration = time.time() - before_op_time
 
-                if self.early_phase == 0:
+                if self.early_phase == 0 and batch_idx >0:
                     duration = time.time() - before_op_time
                     starting_lr = self.model_optimizer.param_groups[0]['lr']
                     print('---------------------------------------------------------------------------------')
@@ -821,7 +821,7 @@ class Trainer:
             self.models[n].load_state_dict(model_dict)
 
         optimizer_load_path = os.path.join(self.opt.load_weights_folder, "adam.pth")
-        if os.path.isfile(optimizer_load_path) and (not self.opt.use_bright) and (not self.opt.high_depth) and self.opt.scales == [0,1,2,3]:
+        if os.path.isfile(optimizer_load_path) and (not self.opt.use_bright) and self.opt.scales == [0,1,2,3]:
             print("Loading Adam weights")
             optimizer_dict = torch.load(optimizer_load_path, map_location=self.device)
             self.model_optimizer.load_state_dict(optimizer_dict)

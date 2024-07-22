@@ -18,7 +18,6 @@ def seed_all(seed):
     random.seed(seed)
     torch.backends.cudnn.deterministic = True
 
-    # torch.set_deterministic(True)
     torch.backends.cudnn.benchmark = False
     torch.multiprocessing.set_sharing_strategy('file_system')
     torch.set_num_threads(1)

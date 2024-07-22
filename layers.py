@@ -1,8 +1,3 @@
-# Copyright Niantic 2019. Patent Pending. All rights reserved.
-#
-# This software is licensed under the terms of the Monodepth2 licence
-# which allows for non-commercial use only, the full terms of which are made
-# available in the LICENSE file.
 
 from __future__ import absolute_import, division, print_function
 
@@ -175,14 +170,13 @@ class BackprojectDepth(nn.Module):
 class Project3D(nn.Module):
     """Layer which projects 3D points into a camera with intrinsics K and at position T
     """
-    def __init__(self, batch_size, height, width, eps=1e-7, extra_occ=False):
+    def __init__(self, batch_size, height, width, eps=1e-7):
         super(Project3D, self).__init__()
 
         self.batch_size = batch_size
         self.height = height
         self.width = width
         self.eps = eps
-        self.extra_occ = extra_occ
 
     def forward(self, points, K, T):
         P = torch.matmul(K, T)[:, :3, :]
@@ -199,31 +193,6 @@ class Project3D(nn.Module):
         pix_coords = (pix_coords - 0.5) * 2
 
         return pix_coords
-    
-# class Project3D(nn.Module):
-#     """Layer which projects 3D points into a camera with intrinsics K and at position T
-#     """
-#     def __init__(self, batch_size, height, width, eps=1e-7):
-#         super(Project3D, self).__init__()
-
-#         self.batch_size = batch_size
-#         self.height = height
-#         self.width = width
-#         self.eps = eps
-
-#     def forward(self, points, K, T):
-#         P = torch.matmul(K, T)[:, :, :3, :]
-
-#         cam_points = torch.matmul(P, points)
-#         pix_coords = cam_points[:, :, :2, :] / (cam_points[:, :, 2, :].unsqueeze(2) + self.eps)
-#         # pdb.set_trace()
-#         pix_coords = pix_coords.view(len(K), len(T[0]), 2, self.height, self.width)
-#         pix_coords = pix_coords.permute(0, 1, 3, 4, 2)
-#         pix_coords[..., 0] /= self.width - 1
-#         pix_coords[..., 1] /= self.height - 1
-#         pix_coords = (pix_coords - 0.5) * 2
-#         return pix_coords
-
 
 def upsample(x):
     """Upsample input tensor by a factor of 2

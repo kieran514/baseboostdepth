@@ -1,8 +1,3 @@
-# Copyright Niantic 2019. Patent Pending. All rights reserved.
-#
-# This software is licensed under the terms of the Monodepth2 licence
-# which allows for non-commercial use only, the full terms of which are made
-# available in the LICENSE file.
 
 from __future__ import absolute_import, division, print_function
 
@@ -56,7 +51,6 @@ def get_translation_matrix(translation_vector):
     T = torch.zeros(translation_vector.shape[0], 4, 4).to(device=translation_vector.device)
 
     t = translation_vector.contiguous().view(-1, 3, 1)
-
     T[:, 0, 0] = 1
     T[:, 1, 1] = 1
     T[:, 2, 2] = 1
