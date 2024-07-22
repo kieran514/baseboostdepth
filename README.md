@@ -19,6 +19,7 @@ Create a conda environment with the PyTorch library:
 ```bash
 conda env create --file environment.yml
 conda activate baseboostdepth
+pip install git+'https://github.com/otaheri/chamfer_distance'
 ```
 
 ## Training Datasets
