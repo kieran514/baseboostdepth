@@ -22,7 +22,7 @@ python train.py \
 --partial_skip --decomp --pose_error 5.5 \
 --training_file train_files_baselines \
 --weights_init pretrained \
---load_weights_folder None
+--load_weights_folder paper/mono+stereo_pre
 
 # To train with MonoViT use --ViT
 # To train with SQLdepth use --SQL

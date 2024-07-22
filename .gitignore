@@ -19,3 +19,4 @@ Untitled-1.ipynb
 datasets/old
 ckpt/mpvit_small.pth
 validation.py
+vis/

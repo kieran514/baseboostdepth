@@ -1,9 +1,7 @@
 
 from __future__ import absolute_import, division, print_function
-
 # python test_simple.py --image_path /media/kieran/SSDNEW/Robust-Depth-Master/images_test --save_path /media/kieran/SSDNEW/Robust-Depth-Master/images_test --ext png --vit --weights /media/kieran/SSDNEW/Robust-Depth-Master/pretrained/Robust-Depth-MonoVit/weights_best
 from __future__ import absolute_import, division, print_function
-
 import os
 import sys
 import glob
@@ -16,13 +14,11 @@ from tqdm import tqdm
 import torch
 import pdb
 from torchvision import transforms, datasets
-
 import networks
 import networksvit
 from layers import disp_to_depth
 from utils import download_model_if_doesnt_exist
 STEREO_SCALE_FACTOR = 5.4
-
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -39,7 +35,6 @@ def parse_args():
                         action='store_true')
     parser.add_argument('--weights', type=str,
                         help='path to a test image or folder of images', required=True)
-
     return parser.parse_args()
 
 
