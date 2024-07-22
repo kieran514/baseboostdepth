@@ -12,7 +12,7 @@
 
 ## Installation Setup
 
-The models were trained using CUDA 11.1, Python 3.7.4 (conda environment), and PyTorch 1.8.0.
+The models were trained using CUDA 11.1, Python 3.7.4 (conda environment), PyTorch 1.8.0 and Ubuntu 22.04.
 
 Create a conda environment with the PyTorch library:
 
