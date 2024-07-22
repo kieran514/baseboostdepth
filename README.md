@@ -47,11 +47,17 @@ SYNS: (Edge-Acc, Edge-Comp, Point cloud F-Score, Point cloud IoU)
 
 | Model Name | Abs_Rel | RMSE | a1 | Edge-Acc | Edge-Comp | F-Score | IoU | Model resolution | Model |
 |------------|---------|------|----|----------|-----------|---------------------|-----------------|------------------|-------|
-| [BaseBoostDepth](https://drive.google.com/drive/folders/1ay9yLr8R4gHBffUSVJA2C_FVulNKvpaN?usp=sharing) | 0.106 | 4.584 | 0.883 | 2.453 | 3.810 | 0.275 | 0.174 | 640 x 192 | MD2 |
+| [BaseBoostDepth](https://drive.google.com/drive/folders/1k3MbmnX3L8zjZTOpi5oki3IKoyRAKWP8?usp=sharing) | 0.106 | 4.584 | 0.883 | 2.453 | 3.810 | 0.275 | 0.174 | 640 x 192 | MD2 |
+| [BaseBoostDepth (pre)](https://drive.google.com/drive/folders/1ay9yLr8R4gHBffUSVJA2C_FVulNKvpaN?usp=sharing) | 0.104 | 4.544 | 0.888 | 2.432 | 4.763 | 0.268 | 0.168 | 640 x 192 | MD2 |
 | [BaseBoostDepth (pre MonoViT)](https://drive.google.com/drive/folders/1x_VnZsmFy7qI2LknkzCwCUrYMojsfkqo?usp=sharing) | 0.096 | 4.201 | 0.906 | 2.409 | 5.314 | 0.300 | 0.191 | 640 x 192 | MonoViT |
 | [BaseBoostDepth (pre SQLdepth)](https://drive.google.com/drive/folders/1LpYhn4mMpJt-TGrqqt_IkYPdgGT2sGA5?usp=sharing) | 0.084 | 3.980 | 0.920 | 2.505 | 13.164 | 0.246 | 0.151 | 640 x 192 | SQLdepth |
 
 ## Training
+
+### Prepare Validation Data
+```
+python export_gt_depth.py --data_path data/KITTI_RAW --split eigen_zhou
+```
 
 ```
 bash run.sh
@@ -63,7 +69,6 @@ bash run.sh
 We must prepare ground truth files for testing/validation and training.
 ```
 python export_gt_depth.py --data_path data/KITTI_RAW --split eigen
-python export_gt_depth.py --data_path data/KITTI_RAW --split eigen_zhou
 python export_gt_depth.py --data_path data/KITTI_RAW --split eigen_benchmark
 ```
 
@@ -96,7 +101,7 @@ python evaluate_depth.py --load_weights_folder {weights_directorySQL} --eval_mon
 ```
 
 ## SYNS Dataset Creation
-Steps coming very soon... (Before Mid April) 
+Due August
 
 ## References
 
