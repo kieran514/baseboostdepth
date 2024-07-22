@@ -208,7 +208,6 @@ dependencies:
   - pip:
       - albumentations==0.5.2
       - appdirs==1.4.4
-      - chamfer-distance==0.1
       - colour-demosaicing==0.1.6
       - colour-science==0.3.16
       - docker-pycreds==0.4.0

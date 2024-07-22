@@ -151,7 +151,7 @@ def test_simple(args):
                 os.makedirs(output_directory) 
 
             # name_dest_im = os.path.join(output_directory, "{}_{}_disp.jpeg".format(output_name, model))
-            name_dest_im = os.path.join(output_directory, "{}.jpeg".format(output_name))
+            name_dest_im = os.path.join(output_directory, "{}_Base.jpg".format(output_name))
             im.save(name_dest_im)
 
     print('-> Done!')
