@@ -252,8 +252,6 @@ dependencies:
       - threadpoolctl==3.1.0
       - tifffile==2021.11.2
       - timm==0.6.12
-      - torch-scatter==2.0.8
-      - torch-sparse==0.6.12
       - traitlets==5.8.1
       - urllib3==1.26.12
       - wandb==0.16.2
