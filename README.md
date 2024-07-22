@@ -101,7 +101,7 @@ python evaluate_depth.py --load_weights_folder {weights_directorySQL} --eval_mon
 ```
 
 ## SYNS Dataset Creation
-Steps coming very soon... (Before Mid April) 
+Due August
 
 ## References
 
