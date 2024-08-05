@@ -1,8 +1,8 @@
 # BaseBoostDepth: Exploiting Larger Baselines for Self-Supervised Monocular Depth Estimation 
 
 [![Website](assets/badge-website.svg)](https://kieran514.github.io/BaseBoostDepth-Project/)
-[![Paper](https://img.shields.io/badge/arXiv-PDF-b31b1b)]()
-[![Paper](assets/youtube.svg)]()
+[![Paper](https://img.shields.io/badge/arXiv-PDF-b31b1b)](https://arxiv.org/pdf/2407.20437)
+[![Paper](assets/youtube.svg)](https://youtu.be/QbDem7nnbbY)
 
 
 <p align="center">
