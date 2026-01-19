@@ -83,9 +83,6 @@ python evaluate_depth.py --load_weights_folder {weights_directory} --eval_mono -
 ```
 python evaluate_depth.py --load_weights_folder {weights_directoryMonoViT} --eval_mono --kt_path data/KITTI_RAW --eval_split eigen --ViT
 ```
-```
-python evaluate_depth.py --load_weights_folder {weights_directorySQL} --eval_mono --kt_path data/KITTI_RAW --eval_split eigen --SQL
-```
 
 
 #### KITTI Benchmark
@@ -96,9 +93,6 @@ python evaluate_depth.py --load_weights_folder {weights_directory} --eval_mono -
 ```
 python evaluate_depth.py --load_weights_folder {weights_directoryMonoViT} --eval_mono --kt_path data/KITTI_RAW --eval_split eigen_benchmark --ViT
 ```
-```
-python evaluate_depth.py --load_weights_folder {weights_directorySQL} --eval_mono --kt_path data/KITTI_RAW --eval_split eigen_benchmark --SQL
-```
 
 ## SYNS Dataset Creation
 Due August
@@ -107,5 +101,4 @@ Due August
 
 * [Monodepth2](https://github.com/nianticlabs/monodepth2) (ICCV 2019)
 * [MonoViT](https://github.com/zxcqlf/MonoViT) 
-* [SQLdepth](https://github.com/hisfog/SfMNeXt-Impl) 
 
