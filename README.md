@@ -51,7 +51,6 @@ SYNS: (Edge-Acc, Edge-Comp, Point cloud F-Score, Point cloud IoU)
 | [BaseBoostDepth](https://drive.google.com/drive/folders/1k3MbmnX3L8zjZTOpi5oki3IKoyRAKWP8?usp=sharing) | 0.106 | 4.584 | 0.883 | 2.453 | 3.810 | 0.275 | 0.174 | 640 x 192 | MD2 |
 | [BaseBoostDepth (pre)](https://drive.google.com/drive/folders/1ay9yLr8R4gHBffUSVJA2C_FVulNKvpaN?usp=sharing) | 0.104 | 4.544 | 0.888 | 2.432 | 4.763 | 0.268 | 0.168 | 640 x 192 | MD2 |
 | [BaseBoostDepth (pre MonoViT)](https://drive.google.com/drive/folders/1x_VnZsmFy7qI2LknkzCwCUrYMojsfkqo?usp=sharing) | 0.096 | 4.201 | 0.906 | 2.409 | 5.314 | 0.300 | 0.191 | 640 x 192 | MonoViT |
-| [BaseBoostDepth (pre SQLdepth)](https://drive.google.com/drive/folders/1LpYhn4mMpJt-TGrqqt_IkYPdgGT2sGA5?usp=sharing) | 0.084 | 3.980 | 0.920 | 2.505 | 13.164 | 0.246 | 0.151 | 640 x 192 | SQLdepth |
 
 ## Training
 
